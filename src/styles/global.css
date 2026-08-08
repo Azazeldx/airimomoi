@@ -135,10 +135,12 @@
     padding-block: clamp(6rem, 14vh, 11rem);
   }
 
+  /* backdrop-filter forces a readback of everything painted behind the element
+     on every frame it is on screen. With ~25 cards scrolling past, that alone
+     halved the frame rate on a mid-range phone. Touch devices get a more opaque
+     fill instead — near-identical result, no readback. */
   .u-glass {
-    background: color-mix(in srgb, #ffffff 62%, transparent);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: color-mix(in srgb, #ffffff 82%, transparent);
     border: 1px solid color-mix(in srgb, #ffffff 70%, transparent);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-glass);
@@ -146,12 +148,25 @@
 
   /* Dark counterpart to .u-glass, for cards sitting on a stage section. */
   .u-glass-dark {
-    background: color-mix(in srgb, #ffffff 6%, transparent);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: color-mix(in srgb, #ffffff 9%, transparent);
     border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-stage);
+  }
+
+  /* Real glass only where the device can afford it. */
+  @media (hover: hover) and (pointer: fine) {
+    .u-glass {
+      background: color-mix(in srgb, #ffffff 62%, transparent);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .u-glass-dark {
+      background: color-mix(in srgb, #ffffff 6%, transparent);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
   }
 
   .u-eyebrow {
@@ -348,7 +363,6 @@
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     animation-direction: alternate;
-    will-change: transform;
   }
 
   @keyframes u-float {
@@ -371,7 +385,6 @@
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     animation-direction: alternate;
-    will-change: transform;
   }
 
   @keyframes u-shard-drift {
@@ -383,10 +396,22 @@
     }
   }
 
+  /* Soft colour pool. A radial-gradient, NOT a blurred circle: a 130px blur on
+     a 30rem element is one of the most expensive things you can ask a mobile
+     GPU to rasterise, and this is visually indistinguishable at a fraction of
+     the cost. Set `--bloom` to the colour. */
+  .u-glow {
+    background-image: radial-gradient(
+      closest-side,
+      var(--bloom) 0%,
+      color-mix(in srgb, var(--bloom) 55%, transparent) 45%,
+      transparent 100%
+    );
+  }
+
   /* Slow breathing for the stage lighting pools. */
   .u-bloom {
     animation: u-bloom 14s ease-in-out infinite alternate;
-    will-change: transform, opacity;
   }
 
   @keyframes u-bloom {

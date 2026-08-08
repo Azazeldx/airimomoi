@@ -57,11 +57,12 @@ const cutPadding = {
             breathing on opposite phases so the section is never fully still. */}
         <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div
-            class="u-bloom absolute -left-40 top-0 h-[38rem] w-[38rem] rounded-full bg-accent/16 blur-[130px]"
+            class="u-glow u-bloom absolute -left-40 top-0 h-[38rem] w-[38rem]"
+            style="--bloom:rgba(255,125,175,0.26)"
           />
           <div
-            class="u-bloom absolute -right-32 bottom-0 h-[34rem] w-[34rem] rounded-full bg-primary/12 blur-[120px]"
-            style="animation-duration:19s;animation-delay:-7s"
+            class="u-glow u-bloom absolute -right-32 bottom-0 h-[34rem] w-[34rem]"
+            style="--bloom:rgba(248,187,217,0.20);animation-duration:19s;animation-delay:-7s"
           />
         </div>
         {/* Halftone print texture, barely there. */}

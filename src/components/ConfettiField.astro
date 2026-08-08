@@ -50,6 +50,11 @@ const SHAPES: Shape[] = [
 ];
 
 const shapes = SHAPES.slice(0, density);
+
+// Roughly half the shapes are hidden below the `sm` breakpoint. A phone screen
+// shows a fraction of the area a desktop one does, so the same count reads as
+// clutter there anyway — and every one is a running animation.
+const MOBILE_KEEP = 7;
 ---
 
 {/* One parallax hook on the container, not one per shape: wiring ~15 shapes
@@ -63,7 +68,7 @@ const shapes = SHAPES.slice(0, density);
   {
     shapes.map((s, i) => (
       <span
-        class="u-confetti absolute"
+        class:list={['u-confetti absolute', i >= MOBILE_KEEP && 'hidden sm:block']}
         style={`left:${s.x}%;top:${s.y}%;width:${s.size}px;height:${s.size}px;${
           tone === 'stage' ? 'opacity:.5;' : 'opacity:.85;'
         }animation-duration:${7 + (i % 5) * 1.7}s;animation-delay:-${i * 0.85}s;`}

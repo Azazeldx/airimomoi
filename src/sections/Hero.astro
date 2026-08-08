@@ -42,12 +42,12 @@ import heroCharacter from '@/assets/images/wallpapers/wl-character.png';
   <!-- Layer 2 — soft colour bloom for depth between plate and subject. -->
   <div class="pointer-events-none absolute inset-0" aria-hidden="true" data-hero-bloom>
     <div
-      class="u-bloom absolute -left-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-primary/40 blur-[120px]"
+      class="u-glow u-bloom absolute -left-24 top-1/4 h-[28rem] w-[28rem]" style="--bloom:rgba(248,187,217,0.55)"
     >
     </div>
     <div
-      class="u-bloom absolute -right-16 bottom-8 h-[32rem] w-[32rem] rounded-full bg-secondary/50 blur-[130px]"
-      style="animation-duration:17s;animation-delay:-6s"
+      class="u-glow u-bloom absolute -right-16 bottom-8 h-[32rem] w-[32rem]"
+      style="--bloom:rgba(255,216,232,0.65);animation-duration:17s;animation-delay:-6s"
     >
     </div>
   </div>

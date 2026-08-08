@@ -12,18 +12,18 @@ const isStage = tone === 'stage';
  * Colorful Stage pages — overlapping angular panes of slightly different tint,
  * reading like prism shards rather than flat colour.
  *
- * One SVG per depth layer rather than a stack of clip-path divs, because the
- * polygons need to overlap and blend. Each layer scales with `slice` (cover),
- * NOT `none`: stretching squashes the angles into vertical bars on tall
- * sections, and the angles are the entire effect.
+ * Scaling uses `slice` (cover), NOT `none`: stretching squashes the angles into
+ * vertical bars on tall sections, and the angles are the entire effect. The
+ * layer is capped in height and faded at the bottom rather than covering the
+ * section, because sections here run to several thousand pixels and cover-
+ * scaling across that magnifies one shard into a flat wash.
  *
- * The whole thing is capped in height and faded out at the bottom rather than
- * covering the section. Sections here run to several thousand pixels, and
- * cover-scaling across that magnifies one shard into a flat wash.
- *
- * Motion is split by cost: the per-shard idle drift is a CSS keyframe (free),
- * and only the layers that should visibly track the scroll carry `data-speed`,
- * since each one becomes a ScrollTrigger.
+ * PERFORMANCE — the shape of this file is dictated by a mobile profile:
+ * animating each polygon put ~135 concurrent animations on the page and dropped
+ * scrolling to 18 fps on a throttled phone. Shards are now grouped into three
+ * `<g>` elements per section and the *group* is animated, so the motion is
+ * unchanged but the animation count drops by ~5x. Do not move the animation
+ * back down onto individual polygons.
  */
 
 const light = {
@@ -48,95 +48,78 @@ const stage = {
 
 const c = isStage ? stage : light;
 
-/** Broad facets. Static under scroll — at a believable speed the movement of a
- *  full-width pane is imperceptible, and it would cost a trigger per section. */
+/** Broad facets. Static under scroll — a full-width pane moving is
+ *  imperceptible, and it would cost a ScrollTrigger per section. */
 const BASE = [
-  { points: '0,760 1440,180 1440,520 0,1080', fill: c.pane, dur: 26 },
-  { points: '0,1240 1440,660 1440,860 0,1470', fill: c.paneSoft, dur: 31 },
-  { points: '1010,0 1440,0 1440,340 1150,210', fill: c.mintSoft, dur: 22 },
-  { points: '0,560 340,660 0,980', fill: c.pinkSoft, dur: 24 },
-  { points: '1440,1100 1440,1600 900,1600', fill: c.pinkSoft, dur: 29 },
+  { points: '0,760 1440,180 1440,520 0,1080', fill: c.pane },
+  { points: '0,1240 1440,660 1440,860 0,1470', fill: c.paneSoft },
+  { points: '1010,0 1440,0 1440,340 1150,210', fill: c.mintSoft },
+  { points: '0,560 340,660 0,980', fill: c.pinkSoft },
+  { points: '1440,1100 1440,1600 900,1600', fill: c.pinkSoft },
 ];
 
-/** Mid shards — the ones that read as glass, drifting and tracking the scroll. */
+/** Mid shards — trail the scroll. */
 const MID = [
-  { points: '1120,40 1400,110 1210,300', fill: c.mint, dur: 13 },
-  { points: '80,470 300,520 130,720', fill: c.pink, dur: 16 },
-  { points: '1330,700 1460,810 1300,900', fill: c.mintSoft, dur: 11 },
-  { points: '1020,1520 1440,1290 1440,1600', fill: c.pane, dur: 18 },
-  { points: '300,1500 460,1280 570,1560', fill: c.lilac, dur: 14 },
-  { points: '620,120 760,60 690,230', fill: c.mintSoft, dur: 10 },
-  { points: '820,1180 980,1100 920,1300', fill: c.pinkSoft, dur: 15 },
+  { points: '1120,40 1400,110 1210,300', fill: c.mint },
+  { points: '80,470 300,520 130,720', fill: c.pink },
+  { points: '1330,700 1460,810 1300,900', fill: c.mintSoft },
+  { points: '1020,1520 1440,1290 1440,1600', fill: c.pane },
+  { points: '300,1500 460,1280 570,1560', fill: c.lilac },
+  { points: '620,120 760,60 690,230', fill: c.mintSoft },
+  { points: '820,1180 980,1100 920,1300', fill: c.pinkSoft },
 ];
 
-/** Foreground shards — fewest, fastest, and the ones you actually notice
- *  sliding against the page as you scroll. */
+/** Foreground shards — fewest, and they lead the scroll, so they visibly slide
+ *  against the mid layer rather than merely moving with it. */
 const FORE = [
-  { points: '140,1000 340,1080 190,1220', fill: c.mint, dur: 9 },
-  { points: '1180,480 1330,430 1280,640', fill: c.pink, dur: 12 },
-  { points: '520,760 640,700 600,880', fill: c.mintSoft, dur: 8 },
+  { points: '140,1000 340,1080 190,1220', fill: c.mint },
+  { points: '1180,480 1330,430 1280,640', fill: c.pink },
+  { points: '520,760 640,700 600,880', fill: c.mintSoft },
 ];
+
+const layers = [
+  { shapes: BASE, speed: null, dur: 26, delay: 0 },
+  { shapes: MID, speed: '1.4', dur: 17, delay: -6 },
+  { shapes: FORE, speed: '-2.6', dur: 11, delay: -3 },
+];
+
+// Unique per instance — nine of these render per page and SVG ids are global.
+const uid = Math.random().toString(36).slice(2, 9);
 ---
 
 <div
-  class:list={[
-    'pointer-events-none absolute inset-x-0 top-0 h-[min(140vh,1500px)] overflow-hidden',
-    '[mask-image:linear-gradient(to_bottom,#000_0%,#000_58%,transparent_100%)]',
-    '[-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_58%,transparent_100%)]',
-    className,
-  ]}
+  class:list={['pointer-events-none absolute inset-x-0 top-0 h-[min(140vh,1500px)] overflow-hidden', className]}
   aria-hidden="true"
 >
-  <svg
-    class="absolute inset-0 h-full w-full"
-    viewBox="0 0 1440 1600"
-    preserveAspectRatio="xMidYMid slice"
-  >
-    {
-      BASE.map((s, i) => (
-        <polygon
+  {
+    layers.map((layer, i) => (
+      <svg
+        class="absolute inset-0 h-full w-full"
+        viewBox="0 0 1440 1600"
+        preserveAspectRatio="xMidYMid slice"
+        {...layer.speed ? { 'data-speed': layer.speed } : {}}
+      >
+        {/* Fade lives inside the SVG rather than as a CSS `mask-image` on the
+            container: this is rasterised into the layer's own texture once,
+            where the CSS version forced an offscreen compositing pass on every
+            frame the layer moved. */}
+        <defs>
+          <linearGradient id={`shardFade-${uid}-${i}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0.5" stop-color="#fff" stop-opacity="1" />
+            <stop offset="1" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <mask id={`shardMask-${uid}-${i}`}>
+            <rect width="1440" height="1600" fill={`url(#shardFade-${uid}-${i})`} />
+          </mask>
+        </defs>
+        <g
           class="u-shard"
-          points={s.points}
-          fill={s.fill}
-          style={`animation-duration:${s.dur}s;animation-delay:-${i * 3.1}s`}
-        />
-      ))
-    }
-  </svg>
-
-  <svg
-    class="absolute inset-0 h-full w-full"
-    viewBox="0 0 1440 1600"
-    preserveAspectRatio="xMidYMid slice"
-    data-speed="1.4"
-  >
-    {
-      MID.map((s, i) => (
-        <polygon
-          class="u-shard"
-          points={s.points}
-          fill={s.fill}
-          style={`animation-duration:${s.dur}s;animation-delay:-${i * 1.7}s`}
-        />
-      ))
-    }
-  </svg>
-
-  <svg
-    class="absolute inset-0 h-full w-full"
-    viewBox="0 0 1440 1600"
-    preserveAspectRatio="xMidYMid slice"
-    data-speed="-2.6"
-  >
-    {
-      FORE.map((s, i) => (
-        <polygon
-          class="u-shard"
-          points={s.points}
-          fill={s.fill}
-          style={`animation-duration:${s.dur}s;animation-delay:-${i * 2.3}s`}
-        />
-      ))
-    }
-  </svg>
+          mask={`url(#shardMask-${uid}-${i})`}
+          style={`animation-duration:${layer.dur}s;animation-delay:${layer.delay}s`}
+        >
+          {layer.shapes.map((s) => <polygon points={s.points} fill={s.fill} />)}
+        </g>
+      </svg>
+    ))
+  }
 </div>

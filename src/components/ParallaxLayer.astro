@@ -11,7 +11,7 @@ const { speed, depth = 0, class: className = '' } = Astro.props;
 ---
 
 <div
-  class:list={['will-change-transform', className]}
+  class:list={[className]}
   data-speed={speed}
   {...depth ? { 'data-depth': depth } : {}}
 >

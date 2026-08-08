@@ -105,6 +105,8 @@ import { profile } from '@/data/profile';
       document.querySelectorAll<HTMLElement>('[data-tone="stage"]'),
     );
 
+    const canBlur = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
     const applyChrome = () => {
       const scrolled = window.scrollY > 24;
       const probe = 36; // just inside the bar's own height
@@ -113,10 +115,12 @@ import { profile } from '@/data/profile';
         return top <= probe && bottom >= probe;
       });
 
-      navbar.classList.toggle('backdrop-blur-xl', scrolled);
-      navbar.classList.toggle('bg-bg/70', scrolled && !onStage);
+      // Fixed and visible during every scroll frame — the most expensive possible
+      // place for a backdrop blur, so touch devices get opacity instead.
+      navbar.classList.toggle('backdrop-blur-xl', scrolled && canBlur);
+      navbar.classList.toggle(canBlur ? 'bg-bg/70' : 'bg-bg/95', scrolled && !onStage);
       navbar.classList.toggle('shadow-[0_1px_0_0_rgba(183,110,121,0.12)]', scrolled && !onStage);
-      navbar.classList.toggle('bg-night/75', scrolled && onStage);
+      navbar.classList.toggle(canBlur ? 'bg-night/75' : 'bg-night/95', scrolled && onStage);
       navbar.toggleAttribute('data-on-stage', onStage);
     };
 

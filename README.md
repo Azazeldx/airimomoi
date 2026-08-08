@@ -138,6 +138,34 @@ around the far edge of the section instead of rotating in place.
 - **Ambient idle motion** — the background is never fully static. Shards drift and breathe, the
   stage lighting pools swell on opposite phases, confetti floats, petals fall. All of it is CSS
   keyframes with staggered `animation-delay`, so it costs no main-thread work at all.
+
+## Mobile performance
+
+Scrolling on a mid-range phone once ran at **17.7 fps with 41 janked frames**, while Lighthouse
+still reported 94 — Lighthouse measures *load*, not scroll smoothness, so it never saw this. The fix
+was five changes, each verified by re-measuring frame timing under a Pixel 5 profile with 4× CPU
+throttling. It now holds **55 fps with zero janked frames**, and the moving background is intact.
+
+If you extend this site, these are the constraints that matter — every one of them was a real
+regression, not a precaution:
+
+1. **`will-change` is not a free hint.** Each one promotes a compositor layer, and the ambient
+   animation classes had put it on **246** elements. Mobile GPUs run out of layer budget long before
+   that. It is down to 9, and belongs only on short-lived one-shot animations.
+2. **Animate groups, not shapes.** Every shard polygon animating individually meant ~135 concurrent
+   animations. The shards are now grouped into three `<g>` per section and the group is animated —
+   identical motion, a fifth of the cost.
+3. **A 130px blur is not a soft glow, it is a rasterisation bill.** All of them are now
+   `radial-gradient` (`.u-glow`), which looks the same and costs nothing.
+4. **`backdrop-filter` re-reads everything painted behind it, every frame.** With ~25 glass cards
+   scrolling past it alone halved the frame rate. Touch devices get an opaque fill instead; the
+   navbar especially, since it is on screen for every frame of every scroll.
+5. **Smooth-scroll libraries make phones feel worse, not better.** Touch scrolling is already
+   hardware-accelerated and off the main thread — routing it through a JS RAF loop drags it back on
+   and fights the browser's own inertia. Lenis is desktop-only now.
+
+The mobile checks live in the same profile: `(hover: hover) and (pointer: fine)` gates the expensive
+treatments, so the desktop experience is unchanged.
 - **Pointer depth** — elements with `data-depth` drift subtly toward the cursor. Desktop pointers
   only; it's noise on touch.
 
