@@ -1,0 +1,55 @@
+---
+interface Props {
+  /** Phrases cycled along the band. */
+  items: string[];
+  tone?: 'light' | 'stage' | 'accent';
+  /** Seconds for one full pass. Higher is slower. */
+  duration?: number;
+  reverse?: boolean;
+  class?: string;
+}
+
+const {
+  items,
+  tone = 'light',
+  duration = 38,
+  reverse = false,
+  class: className = '',
+} = Astro.props;
+
+const toneClass = {
+  light: 'bg-transparent text-ink border-y border-rose-gold-soft/25',
+  stage: 'bg-night-soft text-white/85 border-y border-night-line',
+  accent: 'bg-accent text-ink',
+};
+
+// The track holds two identical copies; the keyframe slides exactly -50%, so
+// copy two lands where copy one started and the seam never shows.
+const sequence = [...items, ...items];
+---
+
+<div
+  class:list={['u-marquee relative overflow-hidden py-5', toneClass[tone], className]}
+  aria-hidden="true"
+>
+  <div
+    class:list={['u-marquee-track flex w-max items-center gap-8 whitespace-nowrap']}
+    style={`--marquee-duration:${duration}s;${reverse ? 'animation-direction:reverse;' : ''}`}
+  >
+    {
+      sequence.map((item) => (
+        <span class="flex items-center gap-8">
+          <span class="text-sm font-extrabold uppercase tracking-[0.24em] sm:text-base">
+            {item}
+          </span>
+          <span
+            class:list={[
+              'h-1.5 w-1.5 rotate-45',
+              tone === 'accent' ? 'bg-ink/50' : 'bg-accent',
+            ]}
+          />
+        </span>
+      ))
+    }
+  </div>
+</div>

@@ -1,0 +1,79 @@
+---
+interface Props {
+  id: string;
+  labelledBy: string;
+  class?: string;
+  /** Marks this section as a parallax scene root for child [data-speed] layers. */
+  scene?: boolean;
+  /** `stage` renders the dark concert treatment; `light` is the default page tone. */
+  tone?: 'light' | 'stage';
+  /** Diagonal edge that cuts into the neighbouring section. */
+  cut?: 'none' | 'top' | 'bottom' | 'both';
+}
+
+const {
+  id,
+  labelledBy,
+  class: className = '',
+  scene = false,
+  tone = 'light',
+  cut = 'none',
+} = Astro.props;
+
+const cutClass = {
+  none: '',
+  top: 'u-cut-top',
+  bottom: 'u-cut-bottom',
+  both: 'u-cut-both',
+};
+
+// A cut eats into the section's own box, so the padding has to grow to keep
+// content clear of the slanted edge.
+const cutPadding = {
+  none: '',
+  top: 'pt-[calc(clamp(6rem,14vh,11rem)+4vw)]',
+  bottom: 'pb-[calc(clamp(6rem,14vh,11rem)+4vw)]',
+  both: 'pt-[calc(clamp(6rem,14vh,11rem)+4vw)] pb-[calc(clamp(6rem,14vh,11rem)+4vw)]',
+};
+---
+
+<section
+  id={id}
+  aria-labelledby={labelledBy}
+  class:list={[
+    'u-section',
+    tone === 'stage' && 'bg-night text-white',
+    cutClass[cut],
+    cutPadding[cut],
+    className,
+  ]}
+  data-tone={tone}
+  {...scene ? { 'data-parallax-scene': '' } : {}}
+>
+  {
+    tone === 'stage' && (
+      <>
+        {/* Stage lighting: two pools of colour bleeding in from the edges,
+            breathing on opposite phases so the section is never fully still. */}
+        <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div
+            class="u-bloom absolute -left-40 top-0 h-[38rem] w-[38rem] rounded-full bg-accent/16 blur-[130px]"
+          />
+          <div
+            class="u-bloom absolute -right-32 bottom-0 h-[34rem] w-[34rem] rounded-full bg-primary/12 blur-[120px]"
+            style="animation-duration:19s;animation-delay:-7s"
+          />
+        </div>
+        {/* Halftone print texture, barely there. */}
+        <div
+          class="u-halftone pointer-events-none absolute inset-0 text-white/[0.055]"
+          aria-hidden="true"
+        />
+      </>
+    )
+  }
+
+  <div class="relative">
+    <slot />
+  </div>
+</section>

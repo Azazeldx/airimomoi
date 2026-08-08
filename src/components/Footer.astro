@@ -1,0 +1,99 @@
+---
+import { Icon } from 'astro-icon/components';
+import { navLinks } from '@/data/navigation';
+import { profile } from '@/data/profile';
+---
+
+<!-- Cut to match the stage sections, so the page ends on the same geometry. -->
+<footer class="u-cut-top relative -mt-[3.5vw] overflow-hidden bg-night pt-[4vw] text-white">
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+    <div
+      class="absolute -top-40 left-1/2 h-[34rem] w-[46rem] -translate-x-1/2 rounded-full bg-accent/18 blur-[130px]"
+    >
+    </div>
+  </div>
+  <div
+    class="u-halftone pointer-events-none absolute inset-0 text-white/[0.05]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="u-container relative py-24">
+    <div class="grid gap-14 md:grid-cols-[1.5fr_1fr_1fr]">
+      <div>
+        <p class="u-eyebrow text-accent">Project SEKAI: Colorful Stage</p>
+        <p class="u-display mt-5 text-white">{profile.nameEn}</p>
+        <p class="u-jp mt-3 text-lg tracking-[0.18em] text-accent">{profile.nameJp}</p>
+        <p class="mt-7 max-w-sm text-sm leading-relaxed text-white/60">
+          {profile.tagline}
+        </p>
+      </div>
+
+      <nav aria-label="Footer">
+        <h2 class="text-xs font-extrabold uppercase tracking-[0.24em] text-white/45">Explore</h2>
+        <ul class="mt-6 space-y-3">
+          {
+            navLinks.map((link) => (
+              <li>
+                <a
+                  href={`#${link.id}`}
+                  class="text-sm font-medium text-white/75 transition-colors duration-300 hover:text-accent"
+                  data-scroll-link
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="text-xs font-extrabold uppercase tracking-[0.24em] text-white/45">Sources</h2>
+        <ul class="mt-6 space-y-3">
+          <li>
+            <a
+              href="https://projectsekai.fandom.com/wiki/Momoi_Airi"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-sm font-medium text-white/75 transition-colors duration-300 hover:text-accent"
+            >
+              Project SEKAI Wiki
+              <Icon name="lucide:external-link" class="h-3.5 w-3.5" />
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.colorfulstage.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-sm font-medium text-white/75 transition-colors duration-300 hover:text-accent"
+            >
+              Official Site
+              <Icon name="lucide:external-link" class="h-3.5 w-3.5" />
+            </a>
+          </li>
+          <li>
+            <a
+              href="#top"
+              class="inline-flex items-center gap-1.5 text-sm font-medium text-white/75 transition-colors duration-300 hover:text-accent"
+              data-scroll-link
+            >
+              Back to top
+              <Icon name="lucide:arrow-up" class="h-3.5 w-3.5" />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-16 h-px bg-white/10" aria-hidden="true"></div>
+
+    <p class="mt-8 text-xs leading-relaxed text-white/50">
+      Fan-made tribute site. Airi Momoi, MORE MORE JUMP! and Project SEKAI: Colorful Stage feat.
+      Hatsune Miku are the property of SEGA, Colorful Palette and Crypton Future Media. All
+      artwork belongs to its respective rights holders. Not affiliated with or endorsed by any
+      of them.
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+
+.env
+.env.production
+
+.DS_Store
+Thumbs.db
+
+# Scratch output from the Japanese-subset regeneration steps in README.md
+.jp-glyphs.txt

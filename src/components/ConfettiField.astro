@@ -1,0 +1,96 @@
+---
+interface Props {
+  /** `stage` inverts the shapes for dark sections. */
+  tone?: 'light' | 'stage';
+  /** Rough count. Positions are fixed, so this just slices the list. */
+  density?: number;
+  class?: string;
+}
+
+const { tone = 'light', density = 18, class: className = '' } = Astro.props;
+
+/**
+ * The scattered geometry that defines the official Colorful Stage look:
+ * outlined circles, filled and hollow triangles, and small dots drifting
+ * across a pastel wash.
+ *
+ * Positions are a fixed list rather than randomised — a build-time random
+ * would reshuffle the composition on every deploy, and these were placed to
+ * stay clear of the text column.
+ */
+type Shape = {
+  kind: 'circle' | 'ring' | 'triangle' | 'triangle-outline' | 'dot';
+  x: number; // %
+  y: number; // %
+  size: number; // px
+  color: string;
+  rotate?: number;
+  speed: number; // parallax factor
+};
+
+const SHAPES: Shape[] = [
+  { kind: 'ring', x: 6, y: 12, size: 42, color: '#F8BBD9', speed: 0.5 },
+  { kind: 'triangle', x: 13, y: 62, size: 30, color: '#D8F6F2', rotate: 18, speed: 0.9 },
+  { kind: 'dot', x: 21, y: 26, size: 9, color: '#FF7DAF', speed: 1.3 },
+  { kind: 'triangle-outline', x: 4, y: 78, size: 34, color: '#B7E9F7', rotate: -12, speed: 0.6 },
+  { kind: 'ring', x: 88, y: 18, size: 56, color: '#B7E9F7', speed: 0.7 },
+  { kind: 'triangle', x: 93, y: 55, size: 44, color: '#FFD8E8', rotate: 200, speed: 1.1 },
+  { kind: 'dot', x: 78, y: 8, size: 7, color: '#88DD44', speed: 1.4 },
+  { kind: 'circle', x: 71, y: 88, size: 14, color: '#F8BBD9', speed: 0.8 },
+  { kind: 'ring', x: 34, y: 92, size: 30, color: '#FFD8E8', speed: 1.0 },
+  { kind: 'triangle-outline', x: 96, y: 80, size: 26, color: '#F8BBD9', rotate: 140, speed: 0.5 },
+  { kind: 'dot', x: 46, y: 6, size: 6, color: '#B7E9F7', speed: 1.5 },
+  { kind: 'triangle', x: 62, y: 14, size: 22, color: '#D8F6F2', rotate: 95, speed: 1.2 },
+  { kind: 'ring', x: 16, y: 42, size: 20, color: '#FF7DAF', speed: 1.1 },
+  { kind: 'dot', x: 90, y: 38, size: 10, color: '#FFD8E8', speed: 0.9 },
+  { kind: 'circle', x: 8, y: 30, size: 10, color: '#B7E9F7', speed: 1.3 },
+  { kind: 'triangle-outline', x: 82, y: 68, size: 38, color: '#D8F6F2', rotate: 40, speed: 0.7 },
+  { kind: 'dot', x: 28, y: 74, size: 8, color: '#F8BBD9', speed: 1.2 },
+  { kind: 'circle', x: 55, y: 96, size: 12, color: '#88DD44', speed: 0.6 },
+];
+
+const shapes = SHAPES.slice(0, density);
+---
+
+{/* One parallax hook on the container, not one per shape: wiring ~15 shapes
+    per section into ScrollTrigger individually cost ~120ms of blocking time
+    across the page. The per-shape drift is a CSS keyframe instead. */}
+<div
+  class:list={['pointer-events-none absolute inset-0 overflow-hidden', className]}
+  aria-hidden="true"
+  data-speed="0.6"
+>
+  {
+    shapes.map((s, i) => (
+      <span
+        class="u-confetti absolute"
+        style={`left:${s.x}%;top:${s.y}%;width:${s.size}px;height:${s.size}px;${
+          tone === 'stage' ? 'opacity:.5;' : 'opacity:.85;'
+        }animation-duration:${7 + (i % 5) * 1.7}s;animation-delay:-${i * 0.85}s;`}
+      >
+        {s.kind === 'ring' && (
+          <span
+            class="block h-full w-full rounded-full border-2"
+            style={`border-color:${s.color}`}
+          />
+        )}
+        {s.kind === 'circle' && (
+          <span class="block h-full w-full rounded-full" style={`background:${s.color}`} />
+        )}
+        {s.kind === 'dot' && (
+          <span class="block h-full w-full rounded-full" style={`background:${s.color}`} />
+        )}
+        {s.kind === 'triangle' && (
+          <svg viewBox="0 0 100 88" class="h-full w-full" style={`transform:rotate(${s.rotate ?? 0}deg)`}>
+            <polygon points="50,0 100,88 0,88" fill={s.color} />
+          </svg>
+        )}
+        {s.kind === 'triangle-outline' && (
+          <svg viewBox="0 0 100 88" class="h-full w-full" style={`transform:rotate(${s.rotate ?? 0}deg)`}>
+            <polygon points="50,4 96,84 4,84" fill="none" stroke={s.color} stroke-width="6" />
+          </svg>
+        )}
+      </span>
+    ))
+  }
+</div>

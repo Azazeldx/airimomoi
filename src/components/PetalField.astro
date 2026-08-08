@@ -1,0 +1,18 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<canvas
+  class:list={['pointer-events-none absolute inset-0 h-full w-full', className]}
+  aria-hidden="true"
+  data-petal-field></canvas>
+
+<script>
+  import { initPetals } from '@/scripts/petals';
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-petal-field]').forEach(initPetals);
+</script>

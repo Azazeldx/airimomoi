@@ -1,0 +1,49 @@
+---
+// Reading-progress hairline pinned under the navbar.
+---
+
+<div
+  class="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5"
+  role="progressbar"
+  aria-label="Page scroll progress"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="0"
+  data-scroll-progress
+>
+  <div
+    class="h-full origin-left scale-x-0 bg-gradient-to-r from-primary via-accent to-rose-gold"
+    data-scroll-progress-bar
+  >
+  </div>
+</div>
+
+<script>
+  const track = document.querySelector<HTMLElement>('[data-scroll-progress]');
+  const bar = document.querySelector<HTMLElement>('[data-scroll-progress-bar]');
+
+  if (track && bar) {
+    let ticking = false;
+
+    const update = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+      bar.style.transform = `scaleX(${ratio})`;
+      track.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+      ticking = false;
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+
+    update();
+  }
+</script>

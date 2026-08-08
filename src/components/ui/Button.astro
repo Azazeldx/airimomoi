@@ -1,0 +1,32 @@
+---
+interface Props {
+  href: string;
+  variant?: 'primary' | 'ghost';
+  class?: string;
+  /** Intercepted by the smooth-scroll handler when the href is a same-page anchor. */
+  external?: boolean;
+}
+
+const { href, variant = 'primary', class: className = '', external = false } = Astro.props;
+
+const base =
+  'group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] px-7 py-3.5 text-sm font-semibold tracking-wide transition-all duration-300 ease-[var(--ease-reveal)]';
+
+// Ink on the brand pink reads at ~5.9:1 — white on it is only ~2.2:1, so the
+// dark label is what lets the CTA keep the actual accent colour.
+const variants = {
+  primary:
+    'bg-accent text-ink shadow-[0_10px_30px_-10px_rgba(255,125,175,0.9)] hover:bg-accent-deep hover:text-white hover:shadow-[0_16px_40px_-12px_rgba(196,60,114,0.7)] hover:-translate-y-0.5',
+  ghost:
+    'border border-rose-gold-soft/50 text-ink hover:border-rose-gold hover:bg-white/60 hover:-translate-y-0.5 backdrop-blur-sm',
+};
+---
+
+<a
+  href={href}
+  class:list={[base, variants[variant], className]}
+  data-scroll-link={!external && href.startsWith('#') ? '' : undefined}
+  {...external ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+>
+  <slot />
+</a>

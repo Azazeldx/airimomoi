@@ -1,0 +1,142 @@
+---
+interface Props {
+  tone?: 'light' | 'stage';
+  class?: string;
+}
+
+const { tone = 'light', class: className = '' } = Astro.props;
+const isStage = tone === 'stage';
+
+/**
+ * The large translucent facets that sit under everything on the official
+ * Colorful Stage pages — overlapping angular panes of slightly different tint,
+ * reading like prism shards rather than flat colour.
+ *
+ * One SVG per depth layer rather than a stack of clip-path divs, because the
+ * polygons need to overlap and blend. Each layer scales with `slice` (cover),
+ * NOT `none`: stretching squashes the angles into vertical bars on tall
+ * sections, and the angles are the entire effect.
+ *
+ * The whole thing is capped in height and faded out at the bottom rather than
+ * covering the section. Sections here run to several thousand pixels, and
+ * cover-scaling across that magnifies one shard into a flat wash.
+ *
+ * Motion is split by cost: the per-shard idle drift is a CSS keyframe (free),
+ * and only the layers that should visibly track the scroll carry `data-speed`,
+ * since each one becomes a ScrollTrigger.
+ */
+
+const light = {
+  pane: 'rgba(255,255,255,0.55)',
+  paneSoft: 'rgba(255,255,255,0.34)',
+  mint: 'rgba(120,224,214,0.30)',
+  mintSoft: 'rgba(160,235,228,0.20)',
+  pink: 'rgba(248,187,217,0.42)',
+  pinkSoft: 'rgba(255,216,232,0.30)',
+  lilac: 'rgba(206,196,246,0.24)',
+};
+
+const stage = {
+  pane: 'rgba(255,255,255,0.05)',
+  paneSoft: 'rgba(255,255,255,0.03)',
+  mint: 'rgba(138,216,245,0.10)',
+  mintSoft: 'rgba(138,216,245,0.06)',
+  pink: 'rgba(255,125,175,0.14)',
+  pinkSoft: 'rgba(255,125,175,0.08)',
+  lilac: 'rgba(196,60,114,0.12)',
+};
+
+const c = isStage ? stage : light;
+
+/** Broad facets. Static under scroll — at a believable speed the movement of a
+ *  full-width pane is imperceptible, and it would cost a trigger per section. */
+const BASE = [
+  { points: '0,760 1440,180 1440,520 0,1080', fill: c.pane, dur: 26 },
+  { points: '0,1240 1440,660 1440,860 0,1470', fill: c.paneSoft, dur: 31 },
+  { points: '1010,0 1440,0 1440,340 1150,210', fill: c.mintSoft, dur: 22 },
+  { points: '0,560 340,660 0,980', fill: c.pinkSoft, dur: 24 },
+  { points: '1440,1100 1440,1600 900,1600', fill: c.pinkSoft, dur: 29 },
+];
+
+/** Mid shards — the ones that read as glass, drifting and tracking the scroll. */
+const MID = [
+  { points: '1120,40 1400,110 1210,300', fill: c.mint, dur: 13 },
+  { points: '80,470 300,520 130,720', fill: c.pink, dur: 16 },
+  { points: '1330,700 1460,810 1300,900', fill: c.mintSoft, dur: 11 },
+  { points: '1020,1520 1440,1290 1440,1600', fill: c.pane, dur: 18 },
+  { points: '300,1500 460,1280 570,1560', fill: c.lilac, dur: 14 },
+  { points: '620,120 760,60 690,230', fill: c.mintSoft, dur: 10 },
+  { points: '820,1180 980,1100 920,1300', fill: c.pinkSoft, dur: 15 },
+];
+
+/** Foreground shards — fewest, fastest, and the ones you actually notice
+ *  sliding against the page as you scroll. */
+const FORE = [
+  { points: '140,1000 340,1080 190,1220', fill: c.mint, dur: 9 },
+  { points: '1180,480 1330,430 1280,640', fill: c.pink, dur: 12 },
+  { points: '520,760 640,700 600,880', fill: c.mintSoft, dur: 8 },
+];
+---
+
+<div
+  class:list={[
+    'pointer-events-none absolute inset-x-0 top-0 h-[min(140vh,1500px)] overflow-hidden',
+    '[mask-image:linear-gradient(to_bottom,#000_0%,#000_58%,transparent_100%)]',
+    '[-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_58%,transparent_100%)]',
+    className,
+  ]}
+  aria-hidden="true"
+>
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 1600"
+    preserveAspectRatio="xMidYMid slice"
+  >
+    {
+      BASE.map((s, i) => (
+        <polygon
+          class="u-shard"
+          points={s.points}
+          fill={s.fill}
+          style={`animation-duration:${s.dur}s;animation-delay:-${i * 3.1}s`}
+        />
+      ))
+    }
+  </svg>
+
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 1600"
+    preserveAspectRatio="xMidYMid slice"
+    data-speed="1.4"
+  >
+    {
+      MID.map((s, i) => (
+        <polygon
+          class="u-shard"
+          points={s.points}
+          fill={s.fill}
+          style={`animation-duration:${s.dur}s;animation-delay:-${i * 1.7}s`}
+        />
+      ))
+    }
+  </svg>
+
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 1600"
+    preserveAspectRatio="xMidYMid slice"
+    data-speed="-2.6"
+  >
+    {
+      FORE.map((s, i) => (
+        <polygon
+          class="u-shard"
+          points={s.points}
+          fill={s.fill}
+          style={`animation-duration:${s.dur}s;animation-delay:-${i * 2.3}s`}
+        />
+      ))
+    }
+  </svg>
+</div>

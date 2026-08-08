@@ -1,0 +1,58 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { VoiceLine } from '@/data/voiceLines';
+
+interface Props {
+  line: VoiceLine;
+}
+
+const { line } = Astro.props;
+const src = `/assets/audio/voice-lines/${line.slug}.mp3`;
+---
+
+<article
+  class="u-glass u-reveal-init flex h-full flex-col gap-5 p-7 transition-all duration-500 ease-[var(--ease-reveal)] hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
+  data-reveal
+  data-audio-card
+>
+  <div class="flex items-start gap-4">
+    <button
+      type="button"
+      class="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent text-ink shadow-[0_8px_20px_-6px_rgba(255,125,175,0.9)] transition-all duration-300 hover:scale-105 hover:bg-accent-deep hover:text-white disabled:cursor-not-allowed disabled:bg-primary/45 disabled:text-ink/40 disabled:shadow-none disabled:hover:scale-100"
+      aria-label={`Play voice line: ${line.en}`}
+      data-audio-toggle
+    >
+      <Icon name="lucide:play" class="h-5 w-5 translate-x-px" data-icon-play />
+      <Icon name="lucide:pause" class="hidden h-5 w-5" data-icon-pause />
+    </button>
+
+    <div class="min-w-0 flex-1">
+      <p class="u-jp text-xl leading-snug text-ink">{line.jp}</p>
+      <p class="mt-1.5 text-xs italic tracking-wide text-accent-deep">{line.romaji}</p>
+    </div>
+  </div>
+
+  <div>
+    <div
+      class="h-1 w-full overflow-hidden rounded-full bg-primary/40"
+      role="progressbar"
+      aria-label="Playback progress"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      data-audio-track
+    >
+      <div class="h-full w-0 rounded-full bg-accent-deep" data-audio-fill></div>
+    </div>
+    <p class="mt-2 text-[11px] tracking-wide text-ink-soft" data-audio-status>
+      Audio file not installed
+    </p>
+  </div>
+
+  <div class="mt-auto">
+    <p class="text-base font-bold text-ink">{line.en}</p>
+    <p class="mt-2 text-sm leading-relaxed text-ink-soft">{line.context}</p>
+  </div>
+
+  <audio preload="none" src={src} data-audio-el></audio>
+</article>

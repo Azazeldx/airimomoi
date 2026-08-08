@@ -1,0 +1,96 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image, getImage } from 'astro:assets';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import { gallery } from '@/data/gallery';
+
+// The lightbox is plain DOM, so it needs a resolved URL rather than an
+// ImageMetadata object — pre-render one large variant per item at build time.
+const lightboxSources = await Promise.all(
+  gallery.map((item) => getImage({ src: item.src, width: 1600, format: 'webp' })),
+);
+---
+
+<Section
+  id="gallery"
+  labelledBy="gallery-title"
+  tone="stage"
+  cut="both"
+  class="overflow-hidden"
+>
+  <GlassShards tone="stage" />
+
+  <div class="u-container">
+    <SectionHeading
+      id="gallery-title"
+      eyebrow="Gallery"
+      title="Every card tells a version of her"
+      jp="カードギャラリー"
+      lede="Official card illustrations from Project SEKAI — select any card to view it full size."
+      align="center"
+      tone="stage"
+    />
+  </div>
+
+  <!-- Full-bleed grid: the artwork carries this section, so it gets the width. -->
+  <ul
+    class="mt-24 grid grid-cols-2 gap-3 px-3 sm:gap-4 sm:px-4 lg:grid-cols-4 lg:gap-5 lg:px-5"
+  >
+    {
+      gallery.map((item, index) => (
+        <li
+          class:list={[
+            'u-reveal-init',
+            // Break the grid rhythm so it reads as a layout, not a spreadsheet.
+            (index === 0 || index === 7) && 'lg:col-span-2 lg:row-span-2',
+          ]}
+          data-reveal
+        >
+          <button
+            type="button"
+            class="group relative block h-full w-full overflow-hidden rounded-2xl text-left ring-1 ring-white/10 transition-all duration-500 hover:ring-accent/60"
+            data-lightbox-trigger
+            data-src={lightboxSources[index]!.src}
+            data-alt={item.alt}
+            data-title={item.title}
+            data-caption={item.caption}
+            aria-label={`View ${item.title} full size`}
+          >
+            <Image
+              src={item.src}
+              alt={item.alt}
+              widths={[400, 700, 1100]}
+              sizes="(min-width: 1024px) 26vw, 48vw"
+              loading="lazy"
+              decoding="async"
+              class:list={[
+                'h-full w-full bg-night-soft object-cover transition-transform duration-[1100ms] ease-[var(--ease-reveal)] group-hover:scale-[1.07]',
+                index === 0 || index === 7 ? 'aspect-square lg:aspect-auto' : 'aspect-[4/5]',
+              ]}
+            />
+
+            <span
+              class="absolute inset-0 bg-gradient-to-t from-night via-night/35 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-95"
+              aria-hidden="true"
+            />
+
+            <span class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+              <span class="flex items-center gap-2 text-sm font-extrabold tracking-tight text-white sm:text-base">
+                {item.title}
+                <Icon
+                  name="lucide:maximize-2"
+                  class="h-3.5 w-3.5 shrink-0 text-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                />
+              </span>
+              <span class="mt-1 block max-h-0 overflow-hidden text-xs leading-relaxed text-white/70 transition-all duration-500 ease-[var(--ease-reveal)] group-hover:max-h-20 group-focus-visible:max-h-20">
+                {item.caption}
+              </span>
+            </span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

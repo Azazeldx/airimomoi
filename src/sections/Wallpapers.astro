@@ -1,0 +1,73 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import { wallpapers } from '@/data/wallpapers';
+
+const spanClass = {
+  wide: 'md:col-span-2',
+  tall: 'md:row-span-2',
+  normal: '',
+} as const;
+
+const aspectClass = {
+  wide: 'aspect-[16/9]',
+  tall: 'aspect-[3/4]',
+  normal: 'aspect-[4/3]',
+} as const;
+---
+
+<Section id="wallpapers" labelledBy="wallpapers-title" class="u-wash overflow-hidden" scene>
+  <GlassShards />
+  <ConfettiField density={12} />
+
+  <div class="u-container">
+    <SectionHeading
+      id="wallpapers-title"
+      eyebrow="Wallpapers"
+      title="Take a piece of the stage with you"
+      jp="壁紙"
+      lede="Official wallpaper artwork and promotional banners, ready to download."
+      align="center"
+    />
+
+    <ul class="mt-20 grid auto-rows-auto gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        wallpapers.map((paper) => (
+          <li class:list={['u-reveal-init', spanClass[paper.span]]} data-reveal>
+            <figure class="group relative h-full overflow-hidden rounded-[var(--radius-card)] shadow-[var(--shadow-glass)] transition-shadow duration-500 hover:shadow-[var(--shadow-lift)]">
+              <Image
+                src={paper.src}
+                alt={paper.alt}
+                widths={[480, 800, 1280]}
+                sizes="(min-width: 1024px) 34vw, (min-width: 640px) 48vw, 92vw"
+                loading="lazy"
+                decoding="async"
+                class:list={[
+                  'w-full bg-primary/15 object-cover transition-transform duration-[1100ms] ease-[var(--ease-reveal)] group-hover:scale-[1.05]',
+                  aspectClass[paper.span],
+                ]}
+              />
+
+              <figcaption class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-ink/80 to-transparent p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100">
+                <span class="text-sm font-medium text-white">{paper.title}</span>
+                <a
+                  href={paper.src.src}
+                  download
+                  class="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-ink transition-transform duration-300 hover:scale-105"
+                >
+                  <Icon name="lucide:download" class="h-3.5 w-3.5" />
+                  <span>Download</span>
+                  <span class="sr-only"> {paper.title} wallpaper</span>
+                </a>
+              </figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Section>

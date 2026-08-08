@@ -1,0 +1,137 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<dialog
+  class="fixed inset-0 z-[80] m-0 h-full max-h-full w-full max-w-full bg-transparent p-0 backdrop:bg-ink/70 backdrop:backdrop-blur-md"
+  aria-label="Image viewer"
+  data-lightbox
+>
+  <div class="relative flex h-full w-full flex-col items-center justify-center p-4 sm:p-10">
+    <button
+      type="button"
+      class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 text-ink shadow-lg transition-transform duration-300 hover:scale-105 sm:right-8 sm:top-8"
+      aria-label="Close image viewer"
+      data-lightbox-close
+    >
+      <Icon name="lucide:x" class="h-5 w-5" />
+    </button>
+
+    <button
+      type="button"
+      class="absolute left-3 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/85 text-ink shadow-lg transition-transform duration-300 hover:scale-105 sm:left-8"
+      aria-label="Previous image"
+      data-lightbox-prev
+    >
+      <Icon name="lucide:chevron-left" class="h-6 w-6" />
+    </button>
+
+    <button
+      type="button"
+      class="absolute right-3 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/85 text-ink shadow-lg transition-transform duration-300 hover:scale-105 sm:right-8"
+      aria-label="Next image"
+      data-lightbox-next
+    >
+      <Icon name="lucide:chevron-right" class="h-6 w-6" />
+    </button>
+
+    <figure class="flex max-h-full w-full max-w-5xl flex-col items-center gap-5">
+      <img
+        class="max-h-[72vh] w-auto rounded-2xl object-contain shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]"
+        alt=""
+        data-lightbox-image
+      />
+      <figcaption class="text-center">
+        <p class="text-lg font-medium text-white" data-lightbox-title></p>
+        <p class="mt-1.5 text-sm text-white/70" data-lightbox-caption></p>
+      </figcaption>
+    </figure>
+  </div>
+</dialog>
+
+<script>
+  interface LightboxEntry {
+    src: string;
+    alt: string;
+    title: string;
+    caption: string;
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  const image = document.querySelector<HTMLImageElement>('[data-lightbox-image]');
+  const titleEl = document.querySelector<HTMLElement>('[data-lightbox-title]');
+  const captionEl = document.querySelector<HTMLElement>('[data-lightbox-caption]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+  const prevBtn = document.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
+  const nextBtn = document.querySelector<HTMLButtonElement>('[data-lightbox-next]');
+
+  const triggers = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-lightbox-trigger]'),
+  );
+
+  if (dialog && image && titleEl && captionEl && triggers.length > 0) {
+    const entries: LightboxEntry[] = triggers.map((trigger) => ({
+      src: trigger.dataset.src ?? '',
+      alt: trigger.dataset.alt ?? '',
+      title: trigger.dataset.title ?? '',
+      caption: trigger.dataset.caption ?? '',
+    }));
+
+    let index = 0;
+    let lastFocused: HTMLElement | null = null;
+
+    function render(): void {
+      const entry = entries[index];
+      if (!entry) return;
+      image!.src = entry.src;
+      image!.alt = entry.alt;
+      titleEl!.textContent = entry.title;
+      captionEl!.textContent = entry.caption;
+    }
+
+    function open(startIndex: number): void {
+      index = startIndex;
+      lastFocused = document.activeElement as HTMLElement | null;
+      render();
+      dialog!.showModal();
+      document.body.style.overflow = 'hidden';
+      closeBtn?.focus();
+    }
+
+    function close(): void {
+      dialog!.close();
+      document.body.style.overflow = '';
+      lastFocused?.focus();
+    }
+
+    function step(delta: number): void {
+      index = (index + delta + entries.length) % entries.length;
+      render();
+    }
+
+    triggers.forEach((trigger, i) => trigger.addEventListener('click', () => open(i)));
+    closeBtn?.addEventListener('click', close);
+    prevBtn?.addEventListener('click', () => step(-1));
+    nextBtn?.addEventListener('click', () => step(1));
+
+    // `dialog` handles Escape natively but not the body-scroll lock.
+    dialog.addEventListener('close', () => {
+      document.body.style.overflow = '';
+    });
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        step(-1);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        step(1);
+      }
+    });
+
+    // Click the backdrop (anywhere outside the figure) to dismiss.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) close();
+    });
+  }
+</script>

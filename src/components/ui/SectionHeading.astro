@@ -1,0 +1,112 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  jp?: string;
+  lede?: string;
+  id: string;
+  align?: 'left' | 'center';
+  class?: string;
+  tone?: 'light' | 'stage';
+}
+
+const {
+  eyebrow,
+  title,
+  jp,
+  lede,
+  id,
+  align = 'left',
+  class: className = '',
+  tone = 'light',
+} = Astro.props;
+
+const isStage = tone === 'stage';
+---
+
+<header
+  class:list={[
+    'relative max-w-3xl',
+    align === 'center' && 'mx-auto text-center',
+    className,
+  ]}
+>
+  {
+    /* Ghost outline of the section word behind the heading — the official site's
+       device on its own page banners. Drawn as SVG because it is ornament, not
+       text: at the opacity the effect needs, a real text node is (correctly) a
+       contrast failure, and it would also be read aloud twice. */
+    <svg
+      class:list={[
+        /* Sits behind the h2's first line — pulled any higher it collided with
+           the eyebrow, which carries the same word. */
+        'pointer-events-none absolute top-[2.1rem] w-full select-none overflow-visible sm:top-[2.6rem]',
+        align === 'center' ? 'left-0' : '-left-1',
+      ]}
+      viewBox="0 0 1000 150"
+      preserveAspectRatio={align === 'center' ? 'xMidYMid meet' : 'xMinYMid meet'}
+      aria-hidden="true"
+      focusable="false"
+      role="presentation"
+    >
+      <text
+        x={align === 'center' ? 500 : 0}
+        y="112"
+        text-anchor={align === 'center' ? 'middle' : 'start'}
+        font-size="132"
+        font-weight="800"
+        letter-spacing="13"
+        fill="none"
+        stroke={isStage ? 'rgba(255,125,175,0.42)' : 'rgba(183,110,121,0.34)'}
+        stroke-width="2.5"
+        style="font-family:var(--font-sans)"
+      >
+        {eyebrow.toUpperCase()}
+      </text>
+    </svg>
+  }
+
+  <div class="u-reveal-init relative" data-reveal>
+    <p
+      class:list={['u-eyebrow flex items-center gap-3', align === 'center' && 'justify-center']}
+    >
+      <span
+        class:list={['h-0.5 w-8', isStage ? 'bg-accent' : 'bg-accent-deep']}
+        aria-hidden="true"></span>
+      <span class={isStage ? 'text-accent' : 'text-accent-deep'}>{eyebrow}</span>
+    </p>
+
+    <h2
+      id={id}
+      class:list={['u-display mt-5', isStage ? 'text-white' : 'u-gradient-text']}
+    >
+      {title}
+    </h2>
+
+    {
+      jp && (
+        <p
+          class:list={[
+            'u-jp mt-4 text-lg tracking-[0.14em]',
+            isStage ? 'text-accent' : 'text-rose-gold',
+          ]}
+        >
+          {jp}
+        </p>
+      )
+    }
+
+    {
+      lede && (
+        <p
+          class:list={[
+            'mt-6 text-base sm:text-lg',
+            isStage ? 'text-white/70' : 'text-ink-soft',
+          ]}
+        >
+          {lede}
+        </p>
+      )
+    }
+  </div>
+</header>

@@ -1,0 +1,456 @@
+@import 'tailwindcss';
+
+/**
+ * Noto Sans JP, subset to exactly the ~100 Japanese characters this site uses.
+ * The full family ships 124 unicode-range-split @font-face rules (~103 KB of
+ * render-blocking CSS); the combined `japanese` subset is one ~1 MB file.
+ * A precise subset is 30 KB and one rule.
+ *
+ * IF YOU ADD NEW JAPANESE TEXT, regenerate the font or those glyphs will fall
+ * back to a system font. See the "Regenerating the Japanese subset" section of
+ * README.md for the two commands.
+ */
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../assets/fonts/noto-sans-jp-subset-300.woff2') format('woff2');
+  unicode-range: U+3001, U+301c, U+3042, U+3044, U+3046, U+304d-3054, U+3059-305a,
+    U+305d-3063, U+3066-306b, U+306e-3071, U+307f, U+3082, U+3085, U+3088-308c,
+    U+308f, U+3092-3094, U+3099-309a, U+30a2, U+30a4, U+30ab-30b0, U+30b5-30bc,
+    U+30bf-30c0, U+30c3, U+30c8-30c9, U+30cf-30d7, U+30db-30dd, U+30df, U+30e2-30e3,
+    U+30e5, U+30e9-30eb, U+30f3, U+30fc, U+4e95, U+5358, U+548c, U+58c1, U+5927,
+    U+597d, U+5b50, U+5c4a, U+5e0c, U+601d, U+611b, U+6575, U+65b0, U+65e5, U+671b,
+    U+6843, U+6850, U+68ee, U+7269, U+7c21, U+7d19, U+7d20, U+82b1, U+8389, U+83d3,
+    U+8863, U+88c5, U+8a9e, U+8c37, U+9065, U+91cc, U+91ce, U+92ed, U+968a, U+96eb,
+    U+ff01, U+ff1f;
+}
+
+@theme {
+  --color-primary: #f8bbd9;
+  --color-secondary: #ffd8e8;
+  --color-accent: #ff7daf;
+  /* Darker accent for small text, hovers and focus rings — the base accent is
+     too light to carry text at AA. */
+  --color-accent-deep: #c43c72;
+  --color-bg: #fff9fc;
+  --color-ink: #2b2b2b;
+  /* Slate-purple rather than a warm grey — this is the body tone the official
+     Colorful Stage site uses, and it reads 6.8:1 on the page background. */
+  --color-ink-soft: #555577;
+
+  /* Pastel wash + confetti colours lifted from the official unit pages. */
+  --color-wash-mint: #d8f6f2;
+  --color-wash-sky: #dcefff;
+  --color-mmj: #88dd44;
+  /* Deepened from the classic #B76E79: this carries 12px small-caps labels, and
+     the lighter tone only reached 3.7:1 on the near-white background. */
+  --color-rose-gold: #96525c;
+  /* The light tone kept for hairlines and borders, where contrast is not a factor. */
+  --color-rose-gold-soft: #b76e79;
+
+  /* Stage tones. The dark sections are where the brand pink finally works as a
+     colour rather than a tint — #FF7DAF clears 7:1 on these, where on the pale
+     background it could not carry text at all. */
+  --color-night: #170d14;
+  --color-night-soft: #241521;
+  --color-night-line: #3d2634;
+
+  --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-jp: 'Noto Sans JP', 'Inter Variable', sans-serif;
+
+  --radius-card: 24px;
+  --radius-pill: 999px;
+
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Slight overshoot — the difference between "fades in" and "lands". */
+  --ease-punch: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --shadow-glass: 0 8px 40px -8px rgba(255, 125, 175, 0.25);
+  --shadow-lift: 0 24px 60px -20px rgba(183, 110, 121, 0.35);
+  --shadow-stage: 0 30px 80px -30px rgba(0, 0, 0, 0.75);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Lenis drives scrolling itself; native smooth-scroll would fight it. */
+  html.lenis-active {
+    scroll-behavior: auto;
+  }
+
+  html.lenis-active body {
+    min-height: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-accent-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-ink);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@layer components {
+  .u-container {
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .u-section {
+    position: relative;
+    padding-block: clamp(6rem, 14vh, 11rem);
+  }
+
+  .u-glass {
+    background: color-mix(in srgb, #ffffff 62%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid color-mix(in srgb, #ffffff 70%, transparent);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* Dark counterpart to .u-glass, for cards sitting on a stage section. */
+  .u-glass-dark {
+    background: color-mix(in srgb, #ffffff 6%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid color-mix(in srgb, #ffffff 12%, transparent);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-stage);
+  }
+
+  .u-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-rose-gold);
+  }
+
+  /* Poster type. Heavy, tight and large — the thin weights read editorial,
+     which is the opposite of a stage. */
+  .u-display {
+    font-size: clamp(2.75rem, 6.5vw, 5.75rem);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 0.94;
+  }
+
+  /* The official site's Latin display treatment: uppercase Montserrat Bold with
+     wide tracking. Inter at 700 with the same tracking sits very close, and
+     costs nothing extra since Inter is already loaded as a variable font. */
+  .u-label-lg {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+  }
+
+  /* Gradient display text — JKT48's headline device. Falls back to solid ink
+     where background-clip:text is unsupported. */
+  .u-gradient-text {
+    color: var(--color-accent-deep);
+  }
+
+  @supports (-webkit-background-clip: text) or (background-clip: text) {
+    .u-gradient-text {
+      /* Every stop is deep enough to clear 3:1 for large text on the page
+         background. The obvious pastel pink-to-peach ramp bottoms out around
+         2:1, and a contrast checker cannot see through background-clip:text to
+         catch it — so the stops are chosen deliberately, not by eye. */
+      background-image: linear-gradient(
+        96deg,
+        var(--color-accent-deep) 0%,
+        #e0447f 48%,
+        #d9542f 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  }
+
+  /* Marker-highlight chip: a flat colour block set slightly off-axis, the way
+     JKT48 labels things. Rotation alternates via :nth-child at the call site. */
+  .u-marker {
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: rotate(-2.5deg);
+  }
+
+  /* Diagonal pastel wash — mint on one corner, pink on the other. */
+  .u-wash {
+    background-image: linear-gradient(
+      115deg,
+      var(--color-wash-mint) 0%,
+      var(--color-wash-sky) 22%,
+      var(--color-bg) 50%,
+      color-mix(in srgb, var(--color-secondary) 70%, transparent) 78%,
+      color-mix(in srgb, var(--color-primary) 55%, transparent) 100%
+    );
+  }
+
+  .u-display-xl {
+    font-size: clamp(3.5rem, 11vw, 9rem);
+    font-weight: 900;
+    letter-spacing: -0.055em;
+    line-height: 0.86;
+  }
+
+  /* Outlined type for the oversized index numerals, so they read as stage
+     furniture rather than competing with the headings. */
+  .u-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  .u-outline-light {
+    color: transparent;
+    -webkit-text-stroke: 1.5px color-mix(in srgb, var(--color-rose-gold-soft) 45%, transparent);
+  }
+
+  .u-jp {
+    font-family: var(--font-jp);
+    font-weight: 300;
+  }
+
+  /* Hairline rose-gold divider used between cinematic sections. */
+  .u-rule {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-rose-gold-soft) 55%, transparent),
+      transparent
+    );
+  }
+
+  /* Halftone dot field — the print texture that reads "idol poster". */
+  .u-halftone {
+    background-image: radial-gradient(
+      currentColor 1px,
+      transparent 1.2px
+    );
+    background-size: 10px 10px;
+  }
+
+  /* Diagonal top/bottom edges so stage sections cut into their neighbours
+     instead of stacking as rectangles. */
+  .u-cut-top {
+    clip-path: polygon(0 3.5vw, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .u-cut-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.5vw), 0 100%);
+  }
+
+  .u-cut-both {
+    clip-path: polygon(0 3.5vw, 100% 0, 100% calc(100% - 3.5vw), 0 100%);
+  }
+}
+
+@layer utilities {
+  .u-reveal-init {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.985);
+  }
+
+  /* Fallback for the rare case JS never boots: content must still be visible. */
+  .no-js .u-reveal-init {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Ken Burns: a slow zoom-and-pan loop that starts on hover/focus. No official
+     animated art exists for these cards, and this is what makes a still read as
+     motion — it is a real technique, not a stand-in for a missing GIF. */
+  .u-kenburns {
+    transition: transform 700ms var(--ease-reveal);
+  }
+
+  .group:hover .u-kenburns,
+  .group:focus-visible .u-kenburns {
+    animation: u-kenburns 9s ease-in-out infinite alternate;
+  }
+
+  @keyframes u-kenburns {
+    from {
+      transform: scale(1.08) translate3d(-1.5%, 1%, 0);
+    }
+    to {
+      transform: scale(1.16) translate3d(1.5%, -1.5%, 0);
+    }
+  }
+
+  /* Light sweep across the card surface on hover. */
+  .u-sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 62%
+    );
+    transform: translateX(-120%);
+    transition: transform 900ms var(--ease-reveal);
+    pointer-events: none;
+  }
+
+  .group:hover .u-sheen::after,
+  .group:focus-visible .u-sheen::after {
+    transform: translateX(120%);
+  }
+
+  /* Confetti drift — CSS rather than JS, so a page full of shapes costs no
+     main-thread work. */
+  .u-confetti {
+    animation-name: u-float;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    will-change: transform;
+  }
+
+  @keyframes u-float {
+    from {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    to {
+      transform: translate3d(0, -18px, 0) rotate(8deg);
+    }
+  }
+
+  /* Idle drift for the glass facets, so the background is never fully static
+     even when the page is not being scrolled. `transform-box: fill-box` makes
+     the origin the polygon's own bounding box rather than the SVG viewport —
+     without it every shard rotates around the canvas corner. */
+  .u-shard {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-name: u-shard-drift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    will-change: transform;
+  }
+
+  @keyframes u-shard-drift {
+    from {
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    }
+    to {
+      transform: translate3d(1.2%, -2.2%, 0) rotate(1.6deg) scale(1.045);
+    }
+  }
+
+  /* Slow breathing for the stage lighting pools. */
+  .u-bloom {
+    animation: u-bloom 14s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+
+  @keyframes u-bloom {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.85;
+    }
+    to {
+      transform: translate3d(3%, -4%, 0) scale(1.14);
+      opacity: 1;
+    }
+  }
+
+  /* Marquee: duplicated track slides exactly one copy's width, so the loop
+     is seamless without measuring anything in JS. */
+  .u-marquee-track {
+    animation: u-marquee var(--marquee-duration, 38s) linear infinite;
+  }
+
+  .u-marquee:hover .u-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes u-marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .u-reveal-init {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The marquee, confetti drift and Ken Burns loop are the motions that never
+     stop on their own, so they are stopped explicitly rather than just sped up. */
+  .u-marquee-track,
+  .u-confetti,
+  .u-shard,
+  .u-bloom,
+  .group:hover .u-kenburns,
+  .group:focus-visible .u-kenburns {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .u-sheen::after {
+    display: none;
+  }
+}

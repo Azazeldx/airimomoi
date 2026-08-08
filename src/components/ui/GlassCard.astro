@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+  reveal?: boolean;
+  as?: 'div' | 'article' | 'li' | 'figure';
+}
+
+const { class: className = '', reveal = true, as: Tag = 'div' }: Props = Astro.props;
+---
+
+<Tag
+  class:list={['u-glass', reveal && 'u-reveal-init', className]}
+  {...reveal ? { 'data-reveal': '' } : {}}
+>
+  <slot />
+</Tag>

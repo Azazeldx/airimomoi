@@ -1,0 +1,35 @@
+---
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Timeline from '@/components/Timeline.astro';
+import Marquee from '@/components/Marquee.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+---
+
+<Section id="story" labelledBy="story-title" class="u-wash overflow-hidden" scene>
+  <GlassShards />
+  <ConfettiField density={14} />
+
+  <div class="u-container">
+    <SectionHeading
+      id="story-title"
+      eyebrow="Story"
+      title="An ordinary girl chasing an extraordinary dream"
+      jp="物語"
+      lede="She had already tried once. That is what makes trying again mean something."
+      align="center"
+    />
+
+    <Timeline />
+  </div>
+
+  <div class="mt-24">
+    <Marquee
+      items={['Unyielding', '不屈', 'Follow your dreams', '夢を追いかけて', 'Flowers of Hope']}
+      tone="light"
+      duration={46}
+      reverse
+    />
+  </div>
+</Section>

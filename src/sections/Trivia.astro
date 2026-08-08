@@ -1,0 +1,73 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import GlassCard from '@/components/ui/GlassCard.astro';
+import ParallaxLayer from '@/components/ParallaxLayer.astro';
+import PetalField from '@/components/PetalField.astro';
+import { trivia } from '@/data/trivia';
+import { profile } from '@/data/profile';
+---
+
+<Section id="trivia" labelledBy="trivia-title" class="u-wash overflow-hidden" scene>
+  <GlassShards />
+  <ConfettiField density={16} />
+
+  <PetalField class="-z-10 opacity-60" />
+
+  <ParallaxLayer speed={0.6} class="pointer-events-none absolute inset-0 -z-10">
+    <div
+      class="absolute -left-20 bottom-0 h-[26rem] w-[26rem] rounded-full bg-secondary/40 blur-[120px]"
+      aria-hidden="true"
+    >
+    </div>
+  </ParallaxLayer>
+
+  <div class="u-container">
+    <SectionHeading
+      id="trivia-title"
+      eyebrow="Trivia"
+      title="Small things that make her whole"
+      jp="トリビア"
+      lede="The details that never fit in a character summary."
+      align="center"
+    />
+
+    <ul class="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        trivia.map((item) => (
+          <GlassCard
+            as="li"
+            class="group p-7 transition-transform duration-500 ease-[var(--ease-reveal)] hover:-translate-y-1.5"
+          >
+            <span
+              class="flex h-11 w-11 items-center justify-center rounded-full bg-primary/30 text-accent-deep transition-transform duration-500 ease-[var(--ease-reveal)] group-hover:scale-110"
+              aria-hidden="true"
+            >
+              <Icon name={item.icon} class="h-5 w-5" />
+            </span>
+            <h3 class="mt-5 text-base font-medium text-ink">{item.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-ink-soft">{item.body}</p>
+          </GlassCard>
+        ))
+      }
+    </ul>
+
+    <blockquote
+      class="u-reveal-init mx-auto mt-24 max-w-3xl text-center"
+      data-reveal
+    >
+      <p class="u-display text-balance text-3xl! font-extralight text-ink sm:text-4xl!">
+        “{profile.tagline}”
+      </p>
+      <footer class="mt-6">
+        <p class="u-jp text-sm text-rose-gold">{profile.nameJp}</p>
+        <p class="mt-1 text-xs font-semibold tracking-[0.2em] uppercase text-ink-soft">
+          {profile.unit}
+        </p>
+      </footer>
+    </blockquote>
+  </div>
+</Section>

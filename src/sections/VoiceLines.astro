@@ -1,0 +1,33 @@
+---
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import AudioPlayer from '@/components/AudioPlayer.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import { voiceLines } from '@/data/voiceLines';
+---
+
+<Section id="voice" labelledBy="voice-title" class="u-wash overflow-hidden" scene>
+  <GlassShards />
+  <ConfettiField density={12} />
+
+  <div class="u-container">
+    <SectionHeading
+      id="voice-title"
+      eyebrow="Voice"
+      title="The lines that define her"
+      jp="ボイス"
+      lede="Voiced by Furihata Ai. Original Japanese, romanised reading and translation for each line."
+    />
+
+    <ul class="mt-24 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {
+        voiceLines.map((line) => (
+          <li>
+            <AudioPlayer line={line} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Section>

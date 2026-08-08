@@ -1,0 +1,30 @@
+---
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import Carousel from '@/components/Carousel.astro';
+---
+
+<Section
+  id="costumes"
+  labelledBy="costumes-title"
+  class="u-wash overflow-hidden"
+>
+  <GlassShards />
+  <ConfettiField density={12} />
+
+  <div class="u-container">
+    <SectionHeading
+      id="costumes-title"
+      eyebrow="Costumes"
+      title="Dressed for every version of the dream"
+      jp="衣装"
+      lede="Stage outfits, seasonal costumes and quiet off-duty moments — drag, swipe or use the arrow keys."
+    />
+  </div>
+
+  <div class="u-container">
+    <Carousel />
+  </div>
+</Section>

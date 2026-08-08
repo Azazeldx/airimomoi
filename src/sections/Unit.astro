@@ -1,0 +1,124 @@
+---
+import { Image } from 'astro:assets';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import GlassCard from '@/components/ui/GlassCard.astro';
+import ParallaxLayer from '@/components/ParallaxLayer.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import { group, members } from '@/data/group';
+import groupArt from '@/assets/images/mmj/group-v2.png';
+import mmjLogo from '@/assets/images/mmj/logo.png';
+---
+
+<Section
+  id="unit"
+  labelledBy="unit-title"
+  class="u-wash overflow-hidden"
+  scene
+>
+  <GlassShards />
+  <ConfettiField density={12} />
+
+  <ParallaxLayer speed={0.7} class="pointer-events-none absolute inset-0 -z-10">
+    <Image
+      src={groupArt}
+      alt=""
+      widths={[600, 900]}
+      sizes="60vw"
+      loading="lazy"
+      decoding="async"
+      class="absolute -right-24 top-0 h-full w-auto max-w-none object-contain opacity-[0.13]"
+      aria-hidden="true"
+    />
+  </ParallaxLayer>
+
+  <div class="u-container">
+    <div class="grid gap-14 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-20">
+      <div>
+        <Image
+          src={mmjLogo}
+          alt="MORE MORE JUMP! logo"
+          height={64}
+          densities={[1, 2]}
+          loading="lazy"
+          decoding="async"
+          class="u-reveal-init h-16 w-auto object-contain"
+          data-reveal
+        />
+
+        <SectionHeading
+          id="unit-title"
+          eyebrow="Unit"
+          title={group.name}
+          jp={`${group.nameJp} — ${group.romaji}`}
+          lede={group.profileQuote}
+          class="mt-8"
+        />
+
+        <GlassCard class="mt-10 p-8">
+          <p class="text-base leading-relaxed text-ink-soft">{group.siteBlurb}</p>
+          <div class="u-rule my-7" aria-hidden="true"></div>
+          <p class="text-xs font-semibold tracking-[0.2em] uppercase text-rose-gold">
+            The Stage SEKAI
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-ink-soft">{group.sekai}</p>
+        </GlassCard>
+      </div>
+
+      <ParallaxLayer speed={-0.4} depth={0.2}>
+        <ul class="grid gap-5 sm:grid-cols-2">
+          {
+            members.map((member) => (
+              <GlassCard
+                as="li"
+                class:list={[
+                  'group relative overflow-hidden p-7 transition-transform duration-500 ease-[var(--ease-reveal)] hover:-translate-y-1.5',
+                  member.isAiri && 'ring-2 ring-accent/40',
+                ]}
+              >
+                <span
+                  class="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 transition-transform duration-500 ease-[var(--ease-reveal)] group-hover:scale-x-100"
+                  style={`background:${member.color}`}
+                  aria-hidden="true"
+                />
+                <Image
+                  src={member.icon}
+                  alt=""
+                  width={64}
+                  densities={[1, 2]}
+                  loading="lazy"
+                  decoding="async"
+                  class="h-16 w-16 rounded-full object-cover ring-4 transition-transform duration-500 ease-[var(--ease-reveal)] group-hover:scale-110"
+                  style={`--tw-ring-color:${member.color}66`}
+                  aria-hidden="true"
+                />
+                {/* Flat unit-colour name tag — the device the official pages
+                    use to label members over the group artwork. Ink on these
+                    pastel fills, since white on them fails contrast. */}
+                <h3 class="mt-5">
+                  <span
+                    class="u-label-lg inline-block rounded-[4px] px-2.5 py-1 text-sm text-ink"
+                    style={`background:${member.color}`}
+                  >
+                    {member.nameEn}
+                  </span>
+                  {member.isAiri && (
+                    <span class="ml-2 align-middle text-[10px] font-extrabold tracking-[0.16em] uppercase text-accent-deep">
+                      This site
+                    </span>
+                  )}
+                </h3>
+                <p class="u-jp mt-2.5 text-sm text-rose-gold">{member.nameJp}</p>
+                <p class="mt-3 text-sm leading-relaxed text-ink-soft">{member.role}</p>
+                <p class="mt-4 text-[11px] font-extrabold tracking-[0.16em] uppercase text-ink-soft">
+                  {member.colorName}
+                </p>
+              </GlassCard>
+            ))
+          }
+        </ul>
+      </ParallaxLayer>
+    </div>
+  </div>
+</Section>

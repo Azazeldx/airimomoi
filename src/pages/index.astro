@@ -1,0 +1,32 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/sections/Hero.astro';
+import CharacterIntro from '@/sections/CharacterIntro.astro';
+import Story from '@/sections/Story.astro';
+import Unit from '@/sections/Unit.astro';
+import CardGallery from '@/sections/CardGallery.astro';
+import Costumes from '@/sections/Costumes.astro';
+import VoiceLines from '@/sections/VoiceLines.astro';
+import Music from '@/sections/Music.astro';
+import Wallpapers from '@/sections/Wallpapers.astro';
+import Trivia from '@/sections/Trivia.astro';
+import Lightbox from '@/components/Lightbox.astro';
+---
+
+<BaseLayout
+  title="Airi Momoi · 桃井愛莉 — MORE MORE JUMP! | Project SEKAI"
+  description="A tribute to Airi Momoi of MORE MORE JUMP! from Project SEKAI: Colorful Stage — her story, cards, costumes, voice lines, music and wallpapers."
+>
+  <Hero />
+  <CharacterIntro />
+  <Story />
+  <Unit />
+  <CardGallery />
+  <Costumes />
+  <VoiceLines />
+  <Music />
+  <Wallpapers />
+  <Trivia />
+
+  <Lightbox />
+</BaseLayout>

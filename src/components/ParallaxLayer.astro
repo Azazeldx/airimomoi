@@ -1,0 +1,19 @@
+---
+interface Props {
+  /** Positive trails the scroll (background), negative leads it (foreground). */
+  speed: number;
+  /** Optional pointer-driven depth offset; 0 disables it. */
+  depth?: number;
+  class?: string;
+}
+
+const { speed, depth = 0, class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['will-change-transform', className]}
+  data-speed={speed}
+  {...depth ? { 'data-depth': depth } : {}}
+>
+  <slot />
+</div>

@@ -1,0 +1,97 @@
+---
+import { Image } from 'astro:assets';
+import { timeline } from '@/data/timeline';
+---
+
+<ol class="relative mt-28" data-timeline>
+  <!-- Spine: centred on desktop, tucked left on mobile. -->
+  <div
+    class="absolute bottom-0 left-[19px] top-0 w-px bg-rose-gold-soft/25 md:left-1/2 md:-translate-x-px"
+    aria-hidden="true"
+  >
+    <div
+      class="h-0 w-full origin-top bg-gradient-to-b from-accent to-accent-deep"
+      data-timeline-fill
+    >
+    </div>
+  </div>
+
+  {
+    timeline.map((entry, index) => (
+      <li
+        class:list={[
+          'u-reveal-init relative grid gap-6 pb-20 pl-14 last:pb-0 md:grid-cols-2 md:gap-14 md:pl-0',
+          index % 2 === 1 && 'md:[&>*:first-child]:col-start-2 md:[&>*:last-child]:row-start-1',
+        ]}
+        data-reveal
+      >
+        <span
+          class="absolute left-[13px] top-3 h-3.5 w-3.5 rotate-45 bg-accent shadow-[0_0_0_5px_rgba(255,125,175,0.25)] md:left-1/2 md:-translate-x-1/2"
+          aria-hidden="true"
+        />
+
+        <div class:list={[index % 2 === 0 ? 'md:pr-2 md:text-right' : 'md:pl-2']}>
+          <p class:list={[index % 2 === 0 && 'md:text-right']}>
+            {/* Marker chip, alternating tilt so the column does not look ruled. */}
+            <span
+              class="u-marker rounded-[3px] bg-accent text-[11px] text-ink"
+              style={index % 2 === 1 ? 'transform:rotate(2.5deg)' : undefined}
+            >
+              {entry.year}
+            </span>
+          </p>
+          <h3
+            class="mt-5 text-3xl font-extrabold tracking-[-0.03em] text-ink sm:text-4xl"
+          >
+            {entry.title}
+          </h3>
+          <p class="mt-4 text-sm leading-relaxed text-ink-soft sm:text-base">{entry.body}</p>
+        </div>
+
+        <figure class:list={['group relative', index % 2 === 0 ? 'md:pl-2' : 'md:pr-2']}>
+          {/* Glow bloom behind the card. On a pale background a soft halo barely
+              registers, so this spreads past the card edges and saturates. */}
+          <div
+            class="pointer-events-none absolute inset-4 -z-10 rounded-[var(--radius-card)] bg-[conic-gradient(from_210deg,#FF7DAF,#C43C72,#8AD8F5,#88DD44,#FF7DAF)] opacity-0 blur-[26px] transition-all duration-700 ease-[var(--ease-reveal)] group-hover:-inset-4 group-hover:opacity-90"
+            aria-hidden="true"
+          />
+
+          <div class="u-sheen relative overflow-hidden rounded-[var(--radius-card)] shadow-[var(--shadow-glass)] ring-1 ring-white/60 transition-all duration-700 ease-[var(--ease-reveal)] group-hover:-translate-y-1.5 group-hover:shadow-[0_24px_60px_-18px_rgba(196,60,114,0.55)] group-hover:ring-2 group-hover:ring-white">
+            <Image
+              src={entry.image}
+              alt={entry.alt}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 768px) 44vw, 92vw"
+              loading="lazy"
+              decoding="async"
+              class="u-kenburns aspect-[16/10] w-full bg-primary/15 object-cover"
+            />
+          </div>
+        </figure>
+      </li>
+    ))
+  }
+</ol>
+
+<script>
+  import { gsap, reducedMotion } from '@/scripts/gsap-setup';
+
+  const list = document.querySelector<HTMLElement>('[data-timeline]');
+  const fill = document.querySelector<HTMLElement>('[data-timeline-fill]');
+
+  // The spine draws itself as the reader descends — the section's one scrub effect.
+  if (list && fill && !reducedMotion) {
+    gsap.to(fill, {
+      height: '100%',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: list,
+        start: 'top 65%',
+        end: 'bottom 75%',
+        scrub: 0.6,
+      },
+    });
+  } else if (fill) {
+    fill.style.height = '100%';
+  }
+</script>

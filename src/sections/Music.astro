@@ -1,0 +1,36 @@
+---
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import VideoEmbed from '@/components/VideoEmbed.astro';
+import Marquee from '@/components/Marquee.astro';
+import { music } from '@/data/music';
+---
+
+<Section id="music" labelledBy="music-title" tone="stage" cut="both" class="overflow-hidden">
+  <GlassShards tone="stage" />
+
+  <div class="u-container">
+    <SectionHeading
+      id="music-title"
+      eyebrow="Music"
+      title="Songs from the Stage SEKAI"
+      jp="ミュージック"
+      lede="Official MORE MORE JUMP! music videos. Videos load only when you press play."
+      align="center"
+      tone="stage"
+    />
+
+    <div class="mt-24 grid gap-x-8 gap-y-14 md:grid-cols-2 xl:grid-cols-3">
+      {music.map((track) => <VideoEmbed track={track} />)}
+    </div>
+  </div>
+
+  <div class="mt-24">
+    <Marquee
+      items={['JUMPIN’ OVER !', 'ハッピーシンセサイザ', 'Gimme more!', 'アイドル新鋭隊', 'ダーリンダンス']}
+      tone="accent"
+      duration={42}
+    />
+  </div>
+</Section>

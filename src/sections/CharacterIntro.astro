@@ -1,0 +1,99 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ConfettiField from '@/components/ConfettiField.astro';
+import GlassShards from '@/components/GlassShards.astro';
+import GlassCard from '@/components/ui/GlassCard.astro';
+import ParallaxLayer from '@/components/ParallaxLayer.astro';
+import { profile, profileFacts } from '@/data/profile';
+import airiRender from '@/assets/images/airi/airi-render-original.png';
+---
+
+<Section id="about" labelledBy="about-title" class="u-wash overflow-hidden" scene>
+  <GlassShards />
+  <ConfettiField density={14} />
+
+  <div class="u-container">
+    <SectionHeading
+      id="about-title"
+      eyebrow="Character"
+      title="An idol who knows exactly what it costs"
+      jp="桃井 愛莉 — ももい あいり"
+      lede={profile.intro}
+    />
+
+    <div class="mt-20 grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-16">
+      <ParallaxLayer speed={-0.6} depth={0.35} class="relative">
+        <div
+          class="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-primary/45 to-secondary/30 blur-3xl"
+          aria-hidden="true"
+        >
+        </div>
+        <figure class="u-reveal-init relative" data-reveal>
+          <Image
+            src={airiRender}
+            alt={`${profile.nameEn} full body official render`}
+            widths={[384, 640, 768]}
+            sizes="(min-width: 1024px) 30vw, 88vw"
+            loading="lazy"
+            decoding="async"
+            class="mx-auto w-full max-w-sm object-contain drop-shadow-[0_24px_50px_rgba(183,110,121,0.25)]"
+          />
+        </figure>
+      </ParallaxLayer>
+
+      <div class="space-y-8">
+        <GlassCard class="p-8 sm:p-10">
+          <div class="flex flex-wrap items-center gap-4">
+            <span
+              class="h-10 w-10 shrink-0 rounded-full ring-4 ring-white"
+              style={`background:${profile.color}`}
+              aria-hidden="true"></span>
+            <div>
+              <p class="text-xs font-semibold tracking-[0.2em] uppercase text-rose-gold">
+                Character colour
+              </p>
+              <p class="text-lg text-ink">{profile.colorName} · {profile.color}</p>
+            </div>
+            <span
+              class="ml-auto rounded-full bg-accent/12 px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-deep"
+            >
+              {profile.unit}
+            </span>
+          </div>
+
+          <div class="u-rule my-8" aria-hidden="true"></div>
+
+          {
+            profile.bio.map((paragraph) => (
+              <p class="mt-4 text-base leading-relaxed text-ink-soft first:mt-0">{paragraph}</p>
+            ))
+          }
+        </GlassCard>
+
+        <ul class="grid gap-4 sm:grid-cols-2">
+          {
+            profileFacts.map((fact) => (
+              <GlassCard as="li" class="flex items-start gap-4 p-6">
+                <span
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/30 text-accent-deep"
+                  aria-hidden="true"
+                >
+                  <Icon name={fact.icon} class="h-5 w-5" />
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-xs font-semibold tracking-[0.16em] uppercase text-rose-gold">
+                    {fact.label}
+                  </span>
+                  <span class="mt-1 block text-sm text-ink">{fact.value}</span>
+                </span>
+              </GlassCard>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</Section>
