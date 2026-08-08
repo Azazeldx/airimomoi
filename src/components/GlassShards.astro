@@ -77,9 +77,12 @@ const FORE = [
   { points: '520,760 640,700 600,880', fill: c.mintSoft },
 ];
 
+// Two layers, not three. Each one is a full-width composited layer up to 1500px
+// tall, and nine sections' worth adds up fast on a phone's texture memory.
+// The base and mid shards are merged; the foreground keeps its own layer
+// because opposing scroll directions are what makes the parallax readable.
 const layers = [
-  { shapes: BASE, speed: null, dur: 26, delay: 0 },
-  { shapes: MID, speed: '1.4', dur: 17, delay: -6 },
+  { shapes: [...BASE, ...MID], speed: '1.2', dur: 22, delay: 0 },
   { shapes: FORE, speed: '-2.6', dur: 11, delay: -3 },
 ];
 
@@ -99,25 +102,32 @@ const uid = Math.random().toString(36).slice(2, 9);
         preserveAspectRatio="xMidYMid slice"
         {...layer.speed ? { 'data-speed': layer.speed } : {}}
       >
-        {/* Fade lives inside the SVG rather than as a CSS `mask-image` on the
-            container: this is rasterised into the layer's own texture once,
-            where the CSS version forced an offscreen compositing pass on every
-            frame the layer moved. */}
+        {/* The bottom fade is baked into each shard's own gradient fill.
+            A `<mask>` (or a CSS mask-image) would do the same thing visually,
+            but either one forces an offscreen compositing pass for the whole
+            layer on every frame it moves. A gradient fill is just paint. */}
         <defs>
-          <linearGradient id={`shardFade-${uid}-${i}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0.5" stop-color="#fff" stop-opacity="1" />
-            <stop offset="1" stop-color="#fff" stop-opacity="0" />
-          </linearGradient>
-          <mask id={`shardMask-${uid}-${i}`}>
-            <rect width="1440" height="1600" fill={`url(#shardFade-${uid}-${i})`} />
-          </mask>
+          {layer.shapes.map((s, j) => (
+            <linearGradient
+              id={`sh-${uid}-${i}-${j}`}
+              gradientUnits="userSpaceOnUse"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1600"
+            >
+              <stop offset="0.45" stop-color={s.fill} />
+              <stop offset="1" stop-color={s.fill} stop-opacity="0" />
+            </linearGradient>
+          ))}
         </defs>
         <g
           class="u-shard"
-          mask={`url(#shardMask-${uid}-${i})`}
           style={`animation-duration:${layer.dur}s;animation-delay:${layer.delay}s`}
         >
-          {layer.shapes.map((s) => <polygon points={s.points} fill={s.fill} />)}
+          {layer.shapes.map((s, j) => (
+            <polygon points={s.points} fill={`url(#sh-${uid}-${i}-${j})`} />
+          ))}
         </g>
       </svg>
     ))

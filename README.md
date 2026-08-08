@@ -163,6 +163,25 @@ regression, not a precaution:
 5. **Smooth-scroll libraries make phones feel worse, not better.** Touch scrolling is already
    hardware-accelerated and off the main thread — routing it through a JS RAF loop drags it back on
    and fights the browser's own inertia. Lenis is desktop-only now.
+6. **Never pin a ScrollTrigger on touch.** A phone's URL bar collapses as you scroll, changing the
+   viewport height, which refreshes every trigger *mid-scroll* and recomputes pin spacing — jumping
+   everything below the hero, repeatedly. `ScrollTrigger.config({ ignoreMobileResize: true })` is set
+   globally and the hero's pin is gated to fine pointers.
+7. **`mask-image` and `<mask>` force an offscreen compositing pass** for the whole layer, every frame
+   it moves. The shards' bottom fade is a gradient *fill* instead, which is just paint.
+8. **Preload fonts and give them a metric-matched fallback.** Fonts discovered from a stylesheet
+   arrive after CSS parses; with `font-display: swap` the fallback paints first and every heading
+   re-lays-out when the real face lands. At 9rem that is a large shift. Both faces are preloaded, and
+   `Inter Fallback` in `global.css` carries `size-adjust`/`ascent-override` so the swap changes glyph
+   shapes without moving anything.
+
+### A caveat on measuring this
+
+Headless Chromium is far more forgiving than real hardware and has no URL bar, so it will not
+reproduce the two worst mobile problems above. Verify changes with the frame-timing method (a
+`PerformanceObserver` on `layout-shift`, plus rAF deltas while scrolling) under a device profile with
+CPU **and** network throttling — not with a Lighthouse score, which measures load and will happily
+report 95+ on a page that scrolls badly.
 
 The mobile checks live in the same profile: `(hover: hover) and (pointer: fine)` gates the expensive
 treatments, so the desktop experience is unchanged.

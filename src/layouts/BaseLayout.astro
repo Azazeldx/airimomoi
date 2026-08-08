@@ -3,6 +3,13 @@ import '@fontsource-variable/inter';
 // Noto Sans JP is declared directly in global.css as a hand-subset @font-face.
 import '@/styles/global.css';
 
+// Preloaded, not merely imported. Discovered from a stylesheet, these arrive
+// after CSS parses — on a phone that is late enough for the fallback to paint
+// first and then reflow every heading when the real face swaps in. The hero
+// title is 9rem, so that reflow is a very large layout shift.
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import notoJp from '@/assets/fonts/noto-sans-jp-subset-300.woff2?url';
+
 import Navbar from '@/components/Navbar.astro';
 import Footer from '@/components/Footer.astro';
 import ScrollProgress from '@/components/ui/ScrollProgress.astro';
@@ -32,6 +39,9 @@ const ogImageUrl = new URL(og.src, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#FFF9FC" />
+
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={notoJp} as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />

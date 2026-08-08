@@ -27,6 +27,27 @@
     U+ff01, U+ff1f;
 }
 
+/**
+ * Metric-matched fallback for Inter.
+ *
+ * Preloading makes the real face arrive early, but "early" is not "before
+ * first paint" on a slow connection — and with `font-display: swap` the
+ * fallback paints first, then every heading re-lays-out when Inter lands. At
+ * 9rem that reflow is a large layout shift.
+ *
+ * These overrides make the local fallback occupy exactly the space Inter will,
+ * so the swap changes glyph shapes without moving anything. Values are Inter's
+ * own metrics normalised against Arial's em box.
+ */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+  size-adjust: 107.12%;
+  ascent-override: 90.2%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+}
+
 @theme {
   --color-primary: #f8bbd9;
   --color-secondary: #ffd8e8;
@@ -57,8 +78,8 @@
   --color-night-soft: #241521;
   --color-night-line: #3d2634;
 
-  --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
-  --font-jp: 'Noto Sans JP', 'Inter Variable', sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-jp: 'Noto Sans JP', 'Inter Variable', 'Inter Fallback', sans-serif;
 
   --radius-card: 24px;
   --radius-pill: 999px;

@@ -191,7 +191,15 @@ import heroCharacter from '@/assets/images/wallpapers/wl-character.png';
       gsap.to(cue, { y: 8, repeat: -1, yoyo: true, duration: 1.8, ease: 'sine.inOut' });
     }
 
-    // The one pinned beat on the page: art holds, copy drifts up and dissolves.
+    // The cinematic beat: art holds, copy drifts up and dissolves.
+    //
+    // Pinning is DESKTOP ONLY. On a phone the URL bar collapses as you scroll,
+    // which changes the viewport height, which refreshes ScrollTrigger, which
+    // recomputes pin spacing — and every time that happens the entire page
+    // below the hero jumps. It is a large, repeating layout shift that no
+    // headless run will ever reproduce, because headless has no URL bar.
+    const canPin = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
     gsap
       .timeline({
         scrollTrigger: {
@@ -199,9 +207,12 @@ import heroCharacter from '@/assets/images/wallpapers/wl-character.png';
           start: 'top top',
           end: '+=90%',
           scrub: 0.8,
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
+          pin: canPin,
+          pinSpacing: canPin,
+          anticipatePin: canPin ? 1 : 0,
+          // Ignore height-only viewport changes (the URL bar) even on desktop
+          // devtools device mode, where the same refresh storm applies.
+          invalidateOnRefresh: false,
         },
       })
       .to(copy, { yPercent: -38, opacity: 0, ease: 'power1.in' }, 0)
@@ -209,7 +220,5 @@ import heroCharacter from '@/assets/images/wallpapers/wl-character.png';
       .to(bg, { yPercent: 6, scale: 1.04, ease: 'none' }, 0)
       .to(bloom, { opacity: 0.45, ease: 'none' }, 0)
       .to(cue, { opacity: 0, duration: 0.15 }, 0);
-
-    ScrollTrigger.refresh();
   }
 </script>
